@@ -1,4 +1,4 @@
-package com.example.moattravel.controller;
+package com.example.samuraitravel.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.moattravel.entity.House;
-import com.example.moattravel.form.HouseRegisterForm;
-import com.example.moattravel.repository.HouseRepository;
-import com.example.moattravel.service.HouseService;
+import com.example.samuraitravel.entity.House;
+import com.example.samuraitravel.form.HouseEditForm;
+import com.example.samuraitravel.form.HouseRegisterForm;
+import com.example.samuraitravel.repository.HouseRepository;
+import com.example.samuraitravel.service.HouseService;
 
 @Controller
 @RequestMapping("/admin/houses") //ルートパス基準値設定アノ
@@ -93,5 +94,35 @@ public class AdminHouseController {
 		houseService.create(houseRegisterForm);
 		redirectAttributes.addFlashAttribute("successMessage", "民宿を登録しました。");
 		return "redirect:/admin/houses";
+	}
+
+	@GetMapping("/{id}/edit")
+	public String edit(@PathVariable(name = "id") Integer id, Model model) {
+		House house = houseRepository.getReferenceById(id);
+		String imageName = house.getImageName();
+		HouseEditForm houseEditForm = new HouseEditForm(house.getId(), house.getName(), null, house.getDescription(), house.getPrice(), house.getCapacity(), house.getPostalCode(), house.getAddress(), house.getPhoneNumber());
+		model.addAttribute("imageName", imageName);
+		model.addAttribute("houseEditForm", houseEditForm);
+		return "admin/houses/edit";
+
+	}
+
+	@PostMapping("/{id}/update")
+	public String update(@ModelAttribute @Validated HouseEditForm houseEditForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+
+		if (bindingResult.hasErrors()) {
+			return "admin/houses/edit";
+		}
+		houseService.update(houseEditForm);
+		redirectAttributes.addFlashAttribute("successMessage", "民宿情報を編集しました。");
+		return "redirect:/admin/houses";
+	}
+	@PostMapping("/{id}/delete")
+	public String delete(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
+		houseRepository.deleteById(id);
+
+		redirectAttributes.addFlashAttribute("successMessage", "民宿を削除しました。");
+		return "redirect:/admin/houses";
+
 	}
 }

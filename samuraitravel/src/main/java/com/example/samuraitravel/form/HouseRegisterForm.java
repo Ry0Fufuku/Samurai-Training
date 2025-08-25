@@ -1,4 +1,4 @@
-package com.example.moattravel.form;
+package com.example.samuraitravel.form;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
